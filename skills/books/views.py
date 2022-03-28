@@ -6,43 +6,57 @@ from rest_framework.permissions import AllowAny
 
 from books.models import Book, Author
 
+from books.serializers import AuthorSerializer, BookSerializer
+
 # Create your views here.
 class RetrieveBooks(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request):
-        books_list = Book.objects.all().values()
-        return Response(books_list, status=status.HTTP_200_OK)
+        books_list = Book.objects.all()
+        serializer = BookSerializer(books_list, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RetrieveAuthors(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request):
-        author_list = Author.objects.all().values()
-        return Response(author_list)
+        author_list = Author.objects.all()
+        serializer = AuthorSerializer(author_list, many=True)
+        return Response(serializer.data)
 
 
 class CreateAuthor(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        author_obj = Author.objects.create(
-            first_name = request.data.get('first_name',''),
-            last_name = request.data.get('last_name',''),
-            birth_date = request.data.get('birth_date','')
-        )
-        return Response({'message':'Creado'}, status=status.HTTP_201_CREATED)
+#        author_obj = Author.objects.create(
+#            first_name = request.data.get('first_name',''),
+#            last_name = request.data.get('last_name',''),
+#            birth_date = request.data.get('birth_date','')
+#        )
+        data = request.data
+        serializer = AuthorSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+# Metodo de validacion no recomendado porque no siempre indica el error correcto 
+#        if serializer.is_valid():
+#            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class CreateBook(APIView):
     permission_classes =(AllowAny,)
 
     def post(self, request):
-        book_obj = Book.objects.create(
-            name = request.data.get('name',''),
-            isbn = request.data.get('isbn',''),
-            publisher_date = request.data.get('publisher_date','1700-01-01'),
-            author_id =request.data.get('author_id',1)
-        )
-        return Response({'message':'Creado'}, status=status.HTTP_201_CREATED)
+#        book_obj = Book.objects.create(
+#            name = request.data.get('name',''),
+#            isbn = request.data.get('isbn',''),
+#            publisher_date = request.data.get('publisher_date','1700-01-01'),
+#            author_id =request.data.get('author_id',1)
+#        )
+        serializer = BookSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
