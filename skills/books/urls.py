@@ -12,9 +12,9 @@ urlpatterns = [
     path('authors/create', views.CreateAuthor.as_view()),
     path('authors/<int:author_id>/', views.RetrieveAuthorAPIView.as_view()),
 
-    path('viewset/authors/', AuthorViewSet.as_view({'get':'list'})),
-    path('viewset/authors/create', AuthorViewSet.as_view({'post':'create'})),
-    path('viewset/authors/<int:author_id>/', AuthorViewSet.as_view(
+    path('viewset/authors/', modelview.AuthorViewSet.as_view({'get':'list'})),
+    path('viewset/authors/create', modelview.AuthorViewSet.as_view({'post':'create'})),
+    path('viewset/authors/<int:author_id>/', modelview.AuthorViewSet.as_view(
         {'get':'retrieve',
          'put':'partial_update',
          'delete':'destroy'
